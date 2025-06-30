@@ -9,26 +9,36 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const generateAd = async () => {
-    setLoading(true);
-    setOutput("");
+  setLoading(true);
+  setOutput("");
 
-    const prompt = `Create a social media ad for a ${businessType}.\nProduct/Service: ${product}.\nGoal: ${goal}.\nTone: ${tone}.\nInclude hashtags.`;
+  // Add fallback/defaults
+  const prompt = `
+    Write a short, engaging ad for social media.
 
-    try {
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
-      });
+    Business type: ${businessType || "small business"}
+    Product/Service: ${product || "custom product"}
+    Goal: ${goal || "drive traffic"}
+    Tone: ${tone || "friendly and upbeat"}
 
-      const data = await response.json();
-      setOutput(data.result);
-    } catch (error) {
-      setOutput("Something went wrong. Try again.");
-    }
+    Make sure to include a clear call to action and 2–3 relevant hashtags.
+  `;
 
-    setLoading(false);
-  };
+  try {
+    const response = await fetch("/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
+    });
+
+    const data = await response.json();
+    setOutput(data.result || "No ad was generated. Try again.");
+  } catch (error) {
+    setOutput("Something went wrong. Try again.");
+  }
+
+  setLoading(false);
+};
 
   return (
     <main style={{ maxWidth: 600, margin: "auto", padding: 20 }}>
